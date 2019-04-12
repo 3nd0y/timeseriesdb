@@ -1,0 +1,9 @@
+[{
+	"_id": 1234,
+	"type": "sensor type",
+	"location": 12344, 
+	"data": {
+		"time": null,
+		"value": 123
+	}
+}]

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test HighChart</title>
+	<!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>     -->
+		<script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/moment/moment.js"></script>
+    <script src="node_modules/moment-timezone/moment-timezone.js"></script>
+    <script src="node_modules/flatpickr/dist/flatpickr.js"></script>
+    <link rel="stylesheet" type="text/css" href="node_modules/flatpickr/dist/flatpickr.css">
+
+</head>
+<body>
+<script src="node_modules/highcharts/highcharts.js"></script>
+<div id="head">
+    View data from:
+    <input class="flatpickr flatpickr-input" type="text" placeholder="Select Date.." data-id="datetime" readonly="readonly" id="dateMin"> to:
+    <input class="flatpickr flatpickr-input" type="text" placeholder="Select Date.." data-id="datetime" readonly="readonly" id="dateMax">
+    <span id="generate"><img src="images/arrow_refresh.png" id="refreshicon" style="display: block"></span>
+		<div id="container" style="height: 600px; display: block"></div>
+</div>
+
+<script type="text/javascript">
+    // DateTime Picker
+    $(".flatpickr").flatpickr({
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        maxDate: new Date()
+    });
+    // $("#dateMax").flatpickr({
+    //     maxDate: new Date();
+    // })
+</script>
+<script type="text/javascript">
+// $.ajaxSetup({ cache: false });
+// $(document).ajaxStart ->
+// 	$('.loading').show();
+var tgl = new Date();
+var GMT = tgl.getTimezoneOffset()/60*-1;
+(GMT<0)?GMT='Time using GMT -'+GMT:GMT='Time using GMT +'+GMT;
+
+var chart = Highcharts.chart('container', {
+        title: {
+            text: 'inLabs Sensing'
+        },
+				// plotOptions: {
+				// 		series: {
+				// 		   	turboThreshold: 0
+				// 		}
+		    // },
+        loading: {
+            hideDuration: 1000,
+            showDuration: 1000
+        },
+        chart: {
+            zoomType: 'x',
+            // animation: true
+        },
+        xAxis: {
+            minPadding: 0.05,
+            maxPadding: 0.05,
+            type: 'datetime'
+        },
+        yAxis: {
+            title: {
+            text: 'Sensor'
+            }
+        },
+        subtitle: {
+            text: GMT
+        },
+        time: {
+            useUTC: false
+        }
+
+        // series: [{
+        //     data: array,
+        //     name: 'CPU Percentage',
+        //     type: 'line'
+        // }]
+    })
+chart.showLoading('<object type="image/svg+xml" data="images/Ripple-1s-200px.svg"></object>');
+var array = [];
+$.getJSON("data1.json").done(function(json) {
+// $.getJSON("http://localhost:3000/db").done(function(json) {
+		var jsonLength = Object.keys(json).length;
+    console.log('banyak point: '+jsonLength);
+    // var array = [];
+    for(var i=0; i<jsonLength; i++){
+    	array[i] = Object.entries(json)[i];
+    	array[i][0] = array[i][0]*1000;
+    }
+
+    chart.addSeries({
+            data: array,
+            name: 'CPU Percentage', // will changed by variable from config
+            type: 'line'
+        });
+		})
+    .fail(function(jqxhr, textStatus, error){
+			console.log('Error: ' + error);
+			console.log('Text Status: '+ textStatus);
+			console.log('jqxhr: '+ jqxhr);
+		})
+    .always(function(){
+			alert('Loading selesei..');
+			chart.hideLoading();
+			document.getElementById('container').style.display = 'block';
+			// Default Date Time 30Day
+			var date = moment().format("YYYY-MM-DD HH:mm");
+			document.getElementById('dateMax').value = date;
+			date = moment(parseInt(array[1][0])).format("YYYY-MM-DD HH:mm");;
+			console.log(array[0][1]);
+			document.getElementById('dateMin').value = date;
+		});
+
+		$("#generate").css("cursor", "pointer").click(function(){
+				console.log(array[0][0]);
+        var dateMin = document.getElementById("dateMin").value;
+        var dateMax = document.getElementById("dateMax").value;
+        if(dateMin>dateMax)return alert('Wrong Date!');
+        var posixMin = new Date(dateMin).getTime();
+        var posixMax = new Date(dateMax).getTime();
+        console.log('Min: ' + posixMin + ', Max: ' + posixMax);
+        while( chart.series.length > 0 ) {
+            chart.series[0].remove( false );
+        }
+        var i=0;
+        var new_array = [];
+				/*
+        console.log(array[i][0]<=posixMin);
+        while(array[i][0]<=posixMin){ // value data don't more than data in array
+            while(array[i][0]<posixMax){ // As long data less than posixMax it should TRUE
+                new_array[i] = array[i];
+                i++;
+                if((array[i])===undefined) break;
+            }
+            i++;
+
+            if((array[i])===undefined) break;
+						console.log('value i: '+i);
+						console.log('array[i]: '+array[i]);
+        }*/
+				// console.log('Pjg Array:'+array.length);
+				var j=0
+				for(i=0;i<array.length;i++){
+					if(posixMin<array[i][0]&&array[i][0]<posixMax){
+						console.log(array[i][0]);
+						new_array[j] = array[i];
+						j++;
+					}
+				}
+				// console.log(array);
+        // console.log(new_array);
+
+        chart.addSeries({
+            data: new_array
+        })
+    });
+</script>
+</body>
+</html>

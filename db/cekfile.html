@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>tes</title>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<script src="data-chart.js"></script>
+</head>
+<body>
+<!-- <embed src="tes.txt"></embed> -->
+<div id="myDiv"></div>
+<script type="text/javascript">
+function include(file)
+{
+
+  var script  = document.createElement('script');
+  script.src  = file;
+  script.type = 'text/javascript';
+  script.defer = true;
+
+  document.getElementsByTagName('head').item(0).appendChild(script);
+
+}
+include('./data-chart.js');
+ // console.log(Object.keys(data));
+ // console.log(Object.values(data));
+
+var a = Object.keys(dataChart);
+var datax = [];
+for (i in a){
+	datax[i] = new Date();
+	datax[i].setTime(a[i]);
+};
+
+var trace1 = [{
+	x: datax,
+	y: Object.values(dataChart),
+	// y: [123,321],
+	// x: [datax[0], datax[1]],
+	type: 'scatter'
+}];
+
+// var data = [trace1, trace2];
+
+Plotly.newPlot('myDiv', trace1);
+</script>
+</body>
+</html>

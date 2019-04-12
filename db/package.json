@@ -1,0 +1,22 @@
+{
+  "name": "timeseriesdb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bunyan": "^1.8.12",
+    "express": "^4.16.4",
+    "moment": "^2.24.0",
+    "mongodb": "^3.1.12",
+    "os-utils": "0.0.14",
+    "promise": "^8.0.3",
+    "promises": "^0.2.5",
+    "q": "^1.5.1",
+    "simple-mongo-timeseries": "git+https://github.com/ianusmagnus/simple-mongo-timeseries.git"
+  }
+}
